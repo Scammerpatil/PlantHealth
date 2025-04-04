@@ -98,13 +98,6 @@ const GuestPage = () => {
         <AntDesign name="arrowleft" size={24} />
       </TouchableOpacity>
 
-      <Text className="text-center text-3xl uppercase mt-20 font-bold text-green-600">
-        Guest Prediction
-      </Text>
-      <Text style={styles.subtitle}>
-        Upload or capture an image to check potato leaf health.
-      </Text>
-
       {image && <Image source={{ uri: imageUrl! }} style={styles.image} />}
       {!image && (
         <Image
@@ -217,7 +210,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   image: {
-    height: 200,
+    marginTop: 50,
+    height: 250,
+    width: 250,
     borderRadius: 10,
     alignSelf: "center",
     marginBottom: 10,

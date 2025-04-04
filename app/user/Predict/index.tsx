@@ -7,6 +7,7 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  Modal,
   StyleSheet,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
@@ -15,7 +16,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-// Translation Dictionary
 const translations: Record<string, Record<string, string>> = {
   en: {
     captureUpload: "Capture or Upload Image",
@@ -26,6 +26,11 @@ const translations: Record<string, Record<string, string>> = {
     prediction: "Prediction",
     suggestedActions: "Suggested Actions",
     confidence: "Confidence",
+    moreInfo: "More Info",
+    "Early Blight":
+      "Early Blight is a fungal disease caused by *Alternaria solani*. It causes dark, concentric lesions on leaves, stems, and fruits. The disease thrives in warm, moist conditions and can spread quickly.",
+    "Late Blight":
+      "Late Blight is a severe fungal disease caused by *Phytophthora infestans*. It leads to large, dark lesions on leaves and stems, causing them to rot. It thrives in cool, moist conditions and spreads rapidly.",
   },
   hi: {
     captureUpload: "छवि कैप्चर या अपलोड करें",
@@ -35,6 +40,12 @@ const translations: Record<string, Record<string, string>> = {
     uploading: "अपलोड हो रहा है...",
     prediction: "भविष्यवाणी",
     suggestedActions: "सुझाए गए कार्य",
+    confidence: "विश्वास",
+    moreInfo: "अधिक जानकारी",
+    "प्रारंभिक गंज":
+      "अर्ली ब्लाइट एक फंगल रोग है जो *Alternaria solani* द्वारा उत्पन्न होता है। यह पत्तियों, तनों और फलों पर अंधेरे, वलयाकार घाव पैदा करता है। यह रोग गर्म और नमी वाले वातावरण में फैलता है और तेजी से प्रसार करता है।",
+    "लेट ब्लाइट":
+      "लेट ब्लाइट एक गंभीर फंगल रोग है जो *Phytophthora infestans* द्वारा उत्पन्न होता है। यह पत्तियों और तनों पर बड़े, गहरे घाव उत्पन्न करता है, जिससे वे सड़ने लगते हैं। यह ठंडे और नमी वाले वातावरण में फैलता है और तेजी से बढ़ता है।",
   },
   mr: {
     captureUpload: "प्रतिमा कॅप्चर किंवा अपलोड करा",
@@ -44,6 +55,12 @@ const translations: Record<string, Record<string, string>> = {
     uploading: "अपलोड सुरू आहे...",
     prediction: "भविष्यवाणी",
     suggestedActions: "सूचित कृती",
+    confidence: "विश्वास",
+    moreInfo: "अधिक माहिती",
+    "प्रारंभिक ब्लीट":
+      "अर्ली ब्लाइट हे *Alternaria solani* नावाच्या फंगल रोगामुळे होतो. यामुळे पानांवर, ताडांवर आणि फळांवर गडद वलय असलेले मॅचेस होतात. हा रोग उष्ण आणि ओलसर हवामानात वाढतो.",
+    "लेट ब्लीट":
+      "लेट ब्लाइट हे *Phytophthora infestans* नावाच्या फंगल रोगामुळे होतो. यामुळे पानांवर आणि ताडांवर मोठ्या, गडद मॅचेस होतात, ज्यामुळे ते सडतात. हा रोग थंड आणि ओलसर हवामानात लवकर पसरणारा आहे.",
   },
   ta: {
     captureUpload: "படத்தை பிடிக்க அல்லது பதிவேற்ற",
@@ -53,6 +70,12 @@ const translations: Record<string, Record<string, string>> = {
     uploading: "பதிவேற்றுகிறது...",
     prediction: "முன்னறிவிப்பு",
     suggestedActions: "பரிந்துரைக்கப்பட்ட செயல்கள்",
+    confidence: "நம்பிக்கை",
+    moreInfo: "மேலும் தகவல்",
+    "பிராரம்பிக பூஞ்சை":
+      "எர்லி பிளைட் என்பது *Alternaria solani* என்ற பூஞ்சை நோயால் ஏற்படும் நோயாகும். இது பத்திரங்கள், கம்பி மற்றும் பழங்களில் கறுப்பு, வட்ட வடிவச் சிதைவுகளை ஏற்படுத்துகிறது. இது வெப்பமான, ஈரமான சூழலில் பரவுகிறது.",
+    "இரவு பூஞ்சை":
+      "லேட் பிளைட் என்பது *Phytophthora infestans* என்ற பூஞ்சை நோயால் ஏற்படும் தீவிரமான நோயாகும், இது பத்திரங்கள் மற்றும் கம்பிகளில் பெரிய, கருப்பு மேச்சுகள் ஏற்படுத்துகிறது, அதனால் அவை சிதைந்து போகின்றன. இது குளிர்ந்த மற்றும் ஈரமான சூழலில் விரைவில் பரவுகிறது.",
   },
   te: {
     captureUpload: "చిత్రాన్ని క్యాప్చర్ చేయండి లేదా అప్లోడ్ చేయండి",
@@ -62,6 +85,12 @@ const translations: Record<string, Record<string, string>> = {
     uploading: "అప్లోడ్ జరుగుతోంది...",
     prediction: "అంచనా",
     suggestedActions: "సూచించిన చర్యలు",
+    confidence: "అంచనా",
+    moreInfo: "అంచనా",
+    "ప్రారంభ బ్లైట్":
+      "ప్రారంభ బ్లైట్ అనేది *Alternaria solani* అనే ఫంగస్ వ్యాధి ద్వారా టమోటా మరియు బంగాళా దుంప మొక్కలను ప్రభావితం చేస్తుంది. ఇది ఆకు, కాయ, మరియు కాండాలలో గఢంగా వలయాల లాంటి మచ్చలు ఏర్పడ causes. ఈ వ్యాధి వేడి, తేమ ఉన్న పరిస్థితుల్లో వేగంగా వ్యాపిస్తుంది.",
+    "వాయిదా బ్లైట్":
+      "వాయిదా బ్లైట్ అనేది *Phytophthora infestans* అనే ఫంగస్ వ్యాధి ద్వారా బంగాళా దుంప మరియు టమోటా మొక్కలను ప్రభావితం చేస్తుంది. ఇది ఆకు మరియు కాండాలలో పెద్ద, గాఢమైన మచ్చలను ఏర్పరచి వాటిని పాడుచేస్తుంది. ఈ వ్యాధి చల్లటి, తేమ ఉన్న పరిస్థితుల్లో వేగంగా వ్యాపిస్తుంది.",
   },
 };
 
@@ -69,11 +98,12 @@ export default function CaptureScreen() {
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [prediction, setPrediction] = useState<string | null>(null);
-  const [confidence, setConfidence] = useState();
+  const [confidence, setConfidence] = useState<number | null>(null);
   const [interpretation, setInterpretation] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [textClass, setTextClass] = useState<string>("");
   const [language, setLanguage] = useState<string>("en");
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchLanguage = async () => {
@@ -88,6 +118,8 @@ export default function CaptureScreen() {
         console.error("Error fetching language:", error);
       }
     };
+
+    fetchLanguage();
   }, []);
 
   const pickImage = async () => {
@@ -111,7 +143,7 @@ export default function CaptureScreen() {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].base64!);
+      setImage(result.assets[0]?.base64!);
     }
   };
 
@@ -167,9 +199,10 @@ export default function CaptureScreen() {
         <Text className="text-2xl font-bold text-base-content mb-4 text-center uppercase">
           {translations[language].captureUpload}
         </Text>
+
         {image ? (
           <Image
-            source={{ uri: "data:image/jpeg;base64," + image }}
+            source={{ uri: `data:image/jpeg;base64,${image}` }}
             style={styles.image}
           />
         ) : (
@@ -223,6 +256,44 @@ export default function CaptureScreen() {
               backgroundColor: "#ccc",
             }}
           >
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 10,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                className={`text-xl font-bold text-center uppercase mt-4 `}
+                style={{
+                  color: textClass,
+                  fontSize: 20,
+                }}
+              >
+                {translations[language].prediction}: {prediction}
+              </Text>
+              {(prediction === "Early Blight" ||
+                prediction === "Late Blight" ||
+                prediction === "प्रारंभिक गंज" ||
+                prediction === "लेट ब्लाइट" ||
+                prediction === "प्रारंभिक ब्लीट" ||
+                prediction === "लेट ब्लीट" ||
+                prediction === "பிராரம்பிக பூஞ்சை" ||
+                prediction === "இரவு பூஞ்சை" ||
+                prediction === "ప్రారంభ బ్లైట్" ||
+                prediction === "వాయిదా బ్లైట్") && (
+                <TouchableOpacity
+                  style={styles.moreInfoButton}
+                  onPress={() => setShowModal(true)}
+                >
+                  <Text className="text-white font-bold">
+                    {translations[language].moreInfo}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
             <Text
               className={`text-xl font-bold text-center uppercase mt-4 `}
               style={{
@@ -230,29 +301,20 @@ export default function CaptureScreen() {
                 fontSize: 24,
               }}
             >
-              {translations[language].prediction}: {prediction}
+              {translations[language].confidence}: {confidence?.toFixed(2)} %
             </Text>
 
-            <Text
-              className={`text-xl font-bold text-center uppercase mt-4 `}
-              style={{
-                color: textClass,
-                fontSize: 24,
-              }}
-            >
-              {translations[language].confidence}: {confidence} %
-            </Text>
-
-            <Text className="text-base text-base-content/80 text-center mt-2">
+            <Text className="text-lg text-base-content/80 text-center mt-2">
               {interpretation}
             </Text>
+
             {suggestions.length > 0 && (
               <View className="mt-4 max-w-md mx-auto mb-36">
-                <Text className="text-base text-base-content">
+                <Text className="text-lg text-base-content">
                   {translations[language].suggestedActions}:
                 </Text>
                 {suggestions.map((suggestion, index) => (
-                  <Text key={index} className="text-base text-base-content/80">
+                  <Text key={index} className="text-lg text-base-content/80">
                     - {suggestion}
                   </Text>
                 ))}
@@ -260,47 +322,46 @@ export default function CaptureScreen() {
             )}
           </View>
         )}
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showModal}
+          onRequestClose={() => setShowModal(false)}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <Text className="text-xl font-bold mb-4">
+                {translations[language].moreInfo}: {prediction}
+              </Text>
+              <Text className="text-lg text-base-content/80 mb-4">
+                {/* More Info */}
+                {translations[language][prediction!]}
+              </Text>
+              <TouchableOpacity
+                onPress={() => setShowModal(false)}
+                style={styles.closeButton}
+              >
+                <Text className="text-white">Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
       <Footer />
     </>
   );
 }
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: "auto",
-    backgroundColor: "#f8f9fa",
-    padding: 20,
-  },
-  backButton: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    backgroundColor: "#F0F0F0",
-    padding: 8,
-    borderRadius: 50,
-    zIndex: 10,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    textAlign: "center",
-    color: "#4CAF50",
-    marginTop: 40,
-    marginBottom: 10,
-    textTransform: "uppercase",
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: "center",
-    color: "#6B7280",
-    marginBottom: 20,
-  },
   image: {
-    height: 200,
+    height: 250,
+    width: 250,
     borderRadius: 10,
     alignSelf: "center",
     marginBottom: 10,
+    borderColor: "black",
+    borderWidth: 1,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -337,35 +398,32 @@ const styles = StyleSheet.create({
   disabledButton: {
     opacity: 0.5,
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-    marginLeft: 8,
-  },
-  predictionText: {
-    fontSize: 18,
-    textAlign: "center",
-    fontWeight: "bold",
+  moreInfoButton: {
+    backgroundColor: "#2196F3",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 8,
     marginTop: 10,
+    alignItems: "center",
   },
-  suggestionsContainer: {
-    marginTop: 20,
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContainer: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+  },
+  closeButton: {
+    backgroundColor: "#2E7D32",
+    paddingVertical: 10,
     paddingHorizontal: 20,
-  },
-  suggestionsTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  suggestionText: {
-    fontSize: 14,
-    color: "#6B7280",
-  },
-  footerText: {
-    fontSize: 14,
-    textAlign: "center",
-    color: "#6B7280",
+    borderRadius: 8,
     marginTop: 20,
+    alignItems: "center",
   },
 });

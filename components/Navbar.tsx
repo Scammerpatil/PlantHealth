@@ -129,6 +129,8 @@ const styles = StyleSheet.create({
   picker: {
     width: "100%",
     height: 30,
+    backgroundColor: "#f0f0f0",
+    color: "#333",
   },
   closeButton: {
     marginTop: 20,

@@ -398,7 +398,6 @@ export async function POST(req: Request) {
       confidence: prediction.confidence,
     });
     await newPrediction.save();
-    console.log(response);
     return Response.json(response, { status: 200 });
   } catch (error) {
     console.error("Error in prediction:", error);
