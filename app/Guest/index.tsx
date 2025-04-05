@@ -8,10 +8,18 @@ import {
   Alert,
   ScrollView,
   StyleSheet,
+  Modal,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+
+const moreInfo = {
+  "Early Blight":
+    "Early Blight is a fungal disease caused by *Alternaria solani*. It causes dark, concentric lesions on leaves, stems, and fruits. The disease thrives in warm, moist conditions and can spread quickly.",
+  "Late Blight":
+    "Late Blight is a severe fungal disease caused by *Phytophthora infestans*. It leads to large, dark lesions on leaves and stems, causing them to rot. It thrives in cool, moist conditions and spreads rapidly.",
+};
 
 const GuestPage = () => {
   const [image, setImage] = useState<string | null>(null);
@@ -21,6 +29,7 @@ const GuestPage = () => {
   const [loading, setLoading] = useState(false);
   const [textClass, setTextClass] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const router = useRouter();
 
   const pickImage = async () => {
@@ -140,15 +149,34 @@ const GuestPage = () => {
         }}
       >
         {prediction && (
-          <Text
-            className={`text-xl font-bold text-center uppercase mt-4 `}
+          <View
             style={{
-              color: textClass,
-              fontSize: 24,
+              display: "flex",
+              flexDirection: "row",
+              gap: 10,
+              justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            Prediction: {prediction}
-          </Text>
+            <Text
+              className={`text-xl font-bold text-center uppercase mt-4 `}
+              style={{
+                color: textClass,
+                fontSize: 20,
+              }}
+            >
+              Prediction: {prediction}
+            </Text>
+            {(prediction === "Early Blight" ||
+              prediction === "Late Blight") && (
+              <TouchableOpacity
+                style={styles.moreInfoButton}
+                onPress={() => setShowModal(true)}
+              >
+                <Text className="text-white font-bold">{"More Info"}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         )}
 
         {interpretation && (
@@ -168,6 +196,29 @@ const GuestPage = () => {
           </View>
         )}
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showModal}
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text className="text-xl font-bold mb-4">
+              More Info: {prediction}
+            </Text>
+            <Text className="text-lg text-base-content/80 mb-4">
+              {moreInfo[prediction!]}
+            </Text>
+            <TouchableOpacity
+              onPress={() => setShowModal(false)}
+              style={styles.closeButton}
+            >
+              <Text className="text-white">Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       <View className="w-full py-4 bg-base-200 items-center mt-10">
         <Text className="text-sm text-base-content/50 text-center">
@@ -282,6 +333,34 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#6B7280",
     marginTop: 20,
+  },
+  moreInfoButton: {
+    backgroundColor: "#2196F3",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContainer: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+  },
+  closeButton: {
+    backgroundColor: "#2E7D32",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 20,
+    alignItems: "center",
   },
 });
 
